@@ -1,2 +1,2 @@
-# MorpholgyVSGeneTrees
-Project for testing disagreements of phylogenetic trees based on morphological traits and trees based on molecular sequences
+# MoleMorph Conflict
+Testing the impact of topological disconcordance between molecular and morphological data under inference using the FBD
