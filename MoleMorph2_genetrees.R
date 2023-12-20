@@ -1,5 +1,6 @@
 # MoleMorph II
 # This script is used to simulate gene trees along species trees
+# requirements: A species tree object of class "phylo"
 rm(list = ls())  # clean local environment
 setwd("C:/Users/timbr/Paleobiology/Gene_Morpho/")                # path     
 
@@ -7,20 +8,20 @@ setwd("C:/Users/timbr/Paleobiology/Gene_Morpho/")                # path
 library(treeducken)
 
 #set a seed for reproducibility
-set.seed(1123581321)
+set.seed(161803)
 
 
 # read in 
 sTrees <- list()
 
-for (i in 1:50){             # this is obviously not clean but solur´tions come later
+for (i in 1:50){             
   t <- paste0("data/speciestrees/species_tree",i,".nex")
   sTrees[[i]] <-read.nexus(t)
 }
 
 # Set parameters
-N <- 10000
-mut_r <- 3
+N <- 10
+mut_r <- 3e-9
 gen_t <- 1e-6
 n_sampled <- 1 
 
@@ -38,12 +39,12 @@ gTrees[[i]] <- sim_msc(sTrees[[i]],
 }
 
 
-# Plotting
-plot(gTrees[[36]][[1]][["container.tree"]])  # same as sTrees[[36]]
-plot(gTrees[[36]][[1]][["gene.trees"]][[1]])
-
 # Print to .nex file
 for (i in 1:length(gTrees)) {
   write.tree(gTrees[[i]][[1]][["gene.trees"]][[1]],  # Q: One [1] is number of locus, what is the other [1?]
               file = paste0("data/genetrees/gene_tree",i,".nwk") )
 }
+
+# Plotting
+plot(gTrees[[36]][[1]][["container.tree"]])  # same as sTrees[[36]]
+plot(gTrees[[36]][[1]][["gene.trees"]][[1]])

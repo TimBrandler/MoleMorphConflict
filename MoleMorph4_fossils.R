@@ -1,5 +1,6 @@
 # MoleMorph IV
 # This script is used to simulate fossils along a phylogeny
+# requirements: A species tree of class "phylo"
 rm(list = ls())  # clean local environment
 setwd("C:/Users/timbr/Paleobiology/Gene_Morpho/")                # path  
 
@@ -8,6 +9,7 @@ library(ape)
 library(devtools)
 #install_github("fossilsim/fossilsim")
 library(FossilSim)
+library(dplyr)
 
 # load in trees
 sTrees <- list()
@@ -17,15 +19,16 @@ for (i in 1:50) {
   sTrees[[i]] <- read.nexus(t)
 }
 
-# Set_seed for reproducibility
+# Set seed for reproducibility
 set.seed(6180)
 
 # Set up Parameters
-sample_r <- 1.5
+sample_r <- 0.5
 rho <- 1
 
 # Simulate fossils on a tree
 fossil <- list()
+
 for (i in 1:length(sTrees)) {
   fossil[[i]] <- sim.fossils.poisson(sample_r, tree = sTrees[[i]])
 }
@@ -38,13 +41,32 @@ for (i in 1:length(fossil)){
   fTrees[[i]]<- sampled.tree.from.combined(tempFtree[[1]], rho = rho)
 }
 
-# Plotting 
-plot(fTrees[[1]])
-
 # Print trees to file
 for (i in 1:length(fTrees)) {
   write.nexus(fTrees[i], file = paste0("data/fossiltrees/fossil_tree",i,".nex") )
 }
 
 
+# Extract and export fossil ages to file
 
+dates <- list()
+
+for (i in 1:length(fossil)){
+
+  d <- matrix(data = round(c(fossil[[i]][[1]],fossil[[i]][[3]]), 2), nrow = length(fossil[[i]][[3]]), ncol = 2, dimnames = list(NULL, c("taxon", "age")))
+  d <- as.data.frame(d)
+  dates[[i]] <- d %>%
+    group_by(taxon) %>%
+    filter(age == max(age)) %>%
+    ungroup()
+
+  cat(write.table(dates[[i]], paste0("data/dates/fossils_",i,".dat"), sep = "\t", row.names = F, col.names = F ))
+  }
+
+
+# Plotting 
+plot(fTrees[[1]])
+
+## Shiny App
+#library(FossilSimShiny)
+#launchFossilSimShiny()
