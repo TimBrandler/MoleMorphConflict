@@ -78,6 +78,8 @@ for (i in 1:50) { # Note that the "50" is just the number of simulations that we
   mscTrees[[i]] <- read.nexus(t)
 }
 
+
+
 # Set up Parameters
 sample_r <- 0.2      # fossil sampling rate, we will use this in a poisson sampling process
 rho <- 1             # recent sampling, we assume perfect sampling in the the recent
@@ -85,30 +87,30 @@ rho <- 1             # recent sampling, we assume perfect sampling in the the re
 # Simulate fossils on a tree
 fozzil <- list()
 
-for (i in 1:length(sTrees)) {
-  fozzil[[i]] <- sim.fossils.poisson(sample_r, tree = sTrees[[i]])
+for (i in 1:length(mscTrees)) {
+  fozzil[[i]] <- sim.fossils.poisson(sample_r, tree = mscTrees[[i]])
 }
 
 # Combine Phylogenies & Fossils
 mfcTrees <- list()
 tempFtree <- list()
 
-for (i in 1:length(fossil)){
-  tempFtree[[i]] <- SAtree.from.fossils(sTrees[[i]],fozzil[[i]])
+for (i in 1:length(fozzil)){
+  tempFtree[[i]] <- SAtree.from.fossils(mscTrees[[i]],fozzil[[i]])
   
   mfcTrees[[i]] <- sampled.tree.from.combined(tempFtree[[i]][[1]], rho = rho)
 }
 
 # Print trees to file
 for (i in 1:length(mfcTrees)) {
-  write.nexus(fTrees[i], file = paste0("data/fossiltrees/mfc_tree",i,".nex") )
+  write.nexus(mfcTrees[i], file = paste0("data/fossiltrees/mfc_tree",i,".nex") )
 }
 
 dates <- list()
 
-for (i in 1:length(fossil)){
+for (i in 1:length(fozzil)){
   
-  d <- matrix(data = c(tempFtree[[i]]$fossils[,6],round(fossil[[i]][[3]], 2)), nrow = length(fozzil[[i]][[3]]), ncol = 2, dimnames = list(NULL, c("taxon", "age")))
+  d <- matrix(data = c(tempFtree[[i]]$fossils[,6] ,round(fozzil[[i]][[3]], 2)), nrow = length(fozzil[[i]][[3]]), ncol = 2, dimnames = list(NULL, c("taxon", "age")))
   dates[[i]] <- as.data.frame(d)
   dates[[i]][["taxon"]] <- paste0(dates[[i]][["taxon"]])
   
